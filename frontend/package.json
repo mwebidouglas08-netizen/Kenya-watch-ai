@@ -1,16 +1,11 @@
 {
-  "name": "kenyawatch-frontend",
+  "name": "kenyawatch",
   "version": "1.0.0",
-  "description": "KenyaWatch AI - Frontend",
-  "main": "server.js",
   "scripts": {
-    "start": "node server.js",
-    "dev": "node server.js"
+    "start": "node backend/server.js",
+    "install-all": "cd backend && npm install && cd ../frontend && npm install"
   },
   "engines": {
     "node": ">=18.0.0"
-  },
-  "dependencies": {
-    "express": "^4.18.2"
   }
 }
