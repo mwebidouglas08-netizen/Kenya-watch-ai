@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>KenyaWatch AI — Anti-Corruption Intelligence Platform</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=Space+Mono:wght@400;700&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg:#0a0e0f;--bg2:#111618;--bg3:#181e20;--card:#141a1c;
+  --border:#1f2a2d;--border2:#263035;
+  --green:#00e676;--green2:#00c853;--green-dim:rgba(0,230,118,0.08);--green-glow:rgba(0,230,118,0.15);
+  --red:#ff4444;--red-dim:rgba(255,68,68,0.1);
+  --amber:#ffb300;--amber-dim:rgba(255,179,0,0.1);
+  --blue:#29b6f6;--blue-dim:rgba(41,182,246,0.1);
+  --text:#e8f0f2;--text2:#8fa8af;--text3:#4a6570;
+  --font-head:'Syne',sans-serif;--font-mono:'Space Mono',monospace;--font-body:'DM Sans',sans-serif;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
+body{background:var(--bg);color:var(--text);font-family:var(--font-body);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;background-image:url("data:image/svg+xml,%3Csvg width='40' height='40' xmlns='http://www.w3.org/2000/svg'%3E%3Ccircle cx='1' cy='1' r='0.5' fill='%23ffffff' opacity='0.02'/%3E%3C/svg%3E");pointer-events:none;z-index:0;}
+
+/* TOPBAR */
+.topbar{position:sticky;top:0;z-index:100;background:rgba(10,14,15,0.92);backdrop-filter:blur(16px);border-bottom:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;padding:0 24px;height:60px;}
+.logo{font-family:var(--font-head);font-weight:800;font-size:18px;display:flex;align-items:center;gap:10px;letter-spacing:-0.5px;}
+.logo-dot{width:8px;height:8px;background:var(--green);border-radius:50%;animation:pulse 2s infinite;}
+@keyframes pulse{0%,100%{box-shadow:0 0 0 0 rgba(0,230,118,0.4)}50%{box-shadow:0 0 0 6px rgba(0,230,118,0)}}
+.logo span{color:var(--green);}
+.status-bar{display:flex;align-items:center;gap:16px;font-family:var(--font-mono);font-size:11px;color:var(--text3);}
+.status-item{display:flex;align-items:center;gap:6px;}
+.status-dot{width:5px;height:5px;border-radius:50%;}
+.s-live{background:var(--green);animation:pulse 1.5s infinite;}
+.s-alert{background:var(--red);}
+
+/* NAV */
+nav{display:flex;gap:2px;background:var(--bg3);border-bottom:1px solid var(--border);padding:0 24px;overflow-x:auto;}
+.nav-btn{font-family:var(--font-mono);font-size:11px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;color:var(--text3);background:none;border:none;padding:14px 16px;cursor:pointer;border-bottom:2px solid transparent;transition:all 0.2s;white-space:nowrap;}
+.nav-btn:hover{color:var(--text);}
+.nav-btn.active{color:var(--green);border-bottom-color:var(--green);}
+
+/* VIEWS */
+.view{display:none;padding:24px;animation:fadein 0.3s ease;}
+.view.active{display:block;}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+
+/* SECTION HEADER */
+.section-header{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:24px;flex-wrap:wrap;gap:12px;}
+.section-title{font-family:var(--font-head);font-size:24px;font-weight:800;letter-spacing:-0.5px;}
+.section-sub{color:var(--text2);font-size:13px;margin-top:4px;}
+.tag{font-family:var(--font-mono);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;padding:4px 10px;border-radius:4px;border:1px solid;}
+.tag-green{color:var(--green);border-color:var(--green);background:var(--green-dim);}
+.tag-red{color:var(--red);border-color:var(--red);background:var(--red-dim);}
+.tag-amber{color:var(--amber);border-color:var(--amber);background:var(--amber-dim);}
+.tag-blue{color:var(--blue);border-color:var(--blue);background:var(--blue-dim);}
+
+/* STATS */
+.stats-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;}
+@media(max-width:800px){.stats-grid{grid-template-columns:repeat(2,1fr);}}
+.stat-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;position:relative;overflow:hidden;}
+.stat-card::before{content:'';position:absolute;top:0;left:0;right:0;height:2px;}
+.stat-card.c-red::before{background:var(--red);}
+.stat-card.c-amber::before{background:var(--amber);}
+.stat-card.c-green::before{background:var(--green);}
+.stat-card.c-blue::before{background:var(--blue);}
+.stat-label{font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:10px;}
+.stat-value{font-family:var(--font-head);font-size:28px;font-weight:800;letter-spacing:-1px;}
+.stat-value.red{color:var(--red);}.stat-value.amber{color:var(--amber);}.stat-value.green{color:var(--green);}.stat-value.blue{color:var(--blue);}
+.stat-delta{font-size:12px;color:var(--text3);margin-top:6px;}
+
+/* GRID */
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:20px;}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:20px;}
+.grid-60-40{display:grid;grid-template-columns:1.5fr 1fr;gap:20px;}
+@media(max-width:800px){.grid-2,.grid-3,.grid-60-40{grid-template-columns:1fr;}}
+
+/* CARD */
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:20px;}
+.card-title{font-family:var(--font-mono);font-size:11px;font-weight:700;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:16px;display:flex;align-items:center;gap:8px;}
+
+/* TABLE */
+.risk-table{width:100%;border-collapse:collapse;}
+.risk-table th{font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:0.08em;text-transform:uppercase;text-align:left;padding:8px 12px;border-bottom:1px solid var(--border);}
+.risk-table td{padding:10px 12px;border-bottom:1px solid var(--border);font-size:13px;}
+.risk-table tr:last-child td{border-bottom:none;}
+.risk-table tr:hover td{background:var(--bg3);}
+.risk-score{font-family:var(--font-mono);font-weight:700;font-size:12px;padding:3px 8px;border-radius:4px;display:inline-block;}
+.rs-high{background:var(--red-dim);color:var(--red);}
+.rs-med{background:var(--amber-dim);color:var(--amber);}
+.rs-low{background:var(--green-dim);color:var(--green);}
+
+/* FEED */
+.feed-item{display:flex;align-items:flex-start;gap:12px;padding:12px 0;border-bottom:1px solid var(--border);}
+.feed-item:last-child{border-bottom:none;}
+.feed-icon{width:32px;height:32px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:14px;flex-shrink:0;}
+.fi-red{background:var(--red-dim);}
+.fi-amber{background:var(--amber-dim);}
+.fi-green{background:var(--green-dim);}
+.fi-blue{background:var(--blue-dim);}
+.feed-title{font-size:13px;font-weight:500;margin-bottom:2px;}
+.feed-meta{font-family:var(--font-mono);font-size:10px;color:var(--text3);}
+
+/* COUNTY BARS */
+.county-list{display:flex;flex-direction:column;gap:10px;}
+.county-item{display:flex;align-items:center;gap:12px;font-size:13px;}
+.county-name{width:100px;color:var(--text2);font-size:12px;flex-shrink:0;}
+.county-bar-wrap{flex:1;background:var(--bg3);border-radius:4px;height:8px;overflow:hidden;}
+.county-bar{height:100%;border-radius:4px;transition:width 1.2s ease;}
+.rb-high{background:var(--red);}
+.rb-med{background:var(--amber);}
+.rb-low{background:var(--green);}
+.county-val{font-family:var(--font-mono);font-size:11px;color:var(--text3);width:30px;text-align:right;}
+
+/* FORM */
+.form-group{margin-bottom:16px;}
+.form-label{font-family:var(--font-mono);font-size:10px;color:var(--text3);letter-spacing:0.1em;text-transform:uppercase;margin-bottom:8px;display:block;}
+.form-input,.form-select,.form-textarea{width:100%;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 14px;transition:border-color 0.2s;outline:none;}
+.form-input:focus,.form-select:focus,.form-textarea:focus{border-color:var(--green);}
+.form-textarea{height:100px;resize:vertical;}
+option{background:var(--bg3);}
+
+/* BUTTONS */
+.btn{font-family:var(--font-mono);font-size:12px;font-weight:700;letter-spacing:0.08em;text-transform:uppercase;padding:12px 22px;border:none;border-radius:8px;cursor:pointer;transition:all 0.2s;display:inline-flex;align-items:center;gap:8px;}
+.btn-green{background:var(--green);color:#000;}
+.btn-green:hover{background:var(--green2);transform:translateY(-1px);}
+.btn-outline{background:transparent;color:var(--green);border:1px solid var(--green);}
+.btn-outline:hover{background:var(--green-dim);}
+.btn-red{background:var(--red);color:#fff;}
+.btn-red:hover{opacity:0.85;}
+.btn:disabled{opacity:0.5;cursor:not-allowed;transform:none!important;}
+
+/* BADGES */
+.badge{font-family:var(--font-mono);font-size:10px;font-weight:700;padding:2px 7px;border-radius:4px;letter-spacing:0.06em;}
+.b-red{background:var(--red-dim);color:var(--red);}
+.b-amber{background:var(--amber-dim);color:var(--amber);}
+.b-green{background:var(--green-dim);color:var(--green);}
+.b-blue{background:var(--blue-dim);color:var(--blue);}
+
+/* CHAT */
+.chat-container{display:flex;flex-direction:column;height:500px;}
+.chat-messages{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:12px;scrollbar-width:thin;scrollbar-color:var(--border) transparent;}
+.msg{max-width:82%;}
+.msg-ai{background:var(--bg3);border:1px solid var(--border);border-radius:12px 12px 12px 4px;padding:12px 16px;font-size:14px;line-height:1.6;}
+.msg-ai strong{color:var(--green);}
+.msg-user{background:var(--green-dim);border:1px solid rgba(0,230,118,0.2);border-radius:12px 12px 4px 12px;padding:12px 16px;font-size:14px;align-self:flex-end;}
+.msg-label{font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-bottom:4px;letter-spacing:0.08em;}
+.chat-input-row{display:flex;gap:8px;padding:12px;border-top:1px solid var(--border);}
+.chat-input{flex:1;background:var(--bg3);border:1px solid var(--border2);border-radius:8px;color:var(--text);font-family:var(--font-body);font-size:14px;padding:10px 14px;outline:none;}
+.chat-input:focus{border-color:var(--green);}
+.typing-indicator{display:none;align-items:center;gap:6px;padding:8px 16px;}
+.typing-indicator.show{display:flex;}
+.typing-dot{width:6px;height:6px;background:var(--green);border-radius:50%;animation:bounce 1.2s infinite;}
+.typing-dot:nth-child(2){animation-delay:0.2s;}
+.typing-dot:nth-child(3){animation-delay:0.4s;}
+@keyframes bounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-6px)}}
+
+/* MODAL */
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.8);backdrop-filter:blur(4px);z-index:200;display:none;align-items:center;justify-content:center;padding:20px;}
+.modal-overlay.show{display:flex;}
+.modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;width:100%;max-width:540px;padding:28px;max-height:90vh;overflow-y:auto;animation:slidein 0.3s ease;}
+@keyframes slidein{from{transform:translateY(20px);opacity:0}to{transform:translateY(0);opacity:1}}
+.modal-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.modal-title{font-family:var(--font-head);font-size:20px;font-weight:800;}
+.modal-close{background:none;border:none;color:var(--text3);font-size:20px;cursor:pointer;}
+.modal-close:hover{color:var(--text);}
+.result-line{display:flex;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border);font-size:13px;}
+.result-line:last-child{border-bottom:none;}
+.result-key{color:var(--text2);}
+
+/* TIMELINE */
+.timeline{position:relative;padding-left:24px;}
+.timeline::before{content:'';position:absolute;left:7px;top:0;bottom:0;width:1px;background:var(--border);}
+.tl-item{position:relative;padding-bottom:20px;}
+.tl-item:last-child{padding-bottom:0;}
+.tl-dot{position:absolute;left:-21px;top:4px;width:10px;height:10px;border-radius:50%;border:2px solid var(--bg);}
+.tl-dot-red{background:var(--red);}
+.tl-dot-amber{background:var(--amber);}
+.tl-dot-green{background:var(--green);}
+.tl-title{font-size:13px;font-weight:500;margin-bottom:3px;}
+.tl-meta{font-family:var(--font-mono);font-size:10px;color:var(--text3);}
+.bar-wrap{background:var(--bg3);border-radius:4px;height:6px;margin-top:8px;overflow:hidden;}
+.bar{height:100%;border-radius:4px;}
+
+/* GHOST CARDS */
+.gp-card{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden;}
+.gp-img{height:120px;display:flex;align-items:center;justify-content:center;position:relative;font-family:var(--font-mono);font-size:12px;}
+.gp-body{padding:16px;}
+.gp-name{font-size:14px;font-weight:500;margin-bottom:4px;}
+.gp-meta{font-family:var(--font-mono);font-size:10px;color:var(--text3);margin-bottom:10px;}
+.gp-compare{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;}
+.gp-col{background:var(--bg3);border-radius:6px;padding:8px;font-size:12px;}
+.gp-col-label{color:var(--text3);font-family:var(--font-mono);font-size:9px;letter-spacing:0.08em;text-transform:uppercase;margin-bottom:3px;}
+
+/* BANNER */
+.banner{background:linear-gradient(90deg,var(--green-dim),transparent);border:1px solid rgba(0,230,118,0.2);border-radius:10px;padding:12px 16px;margin-bottom:24px;display:flex;align-items:center;gap:12px;font-size:13px;}
+
+/* SPINNER */
+.spinner{width:16px;height:16px;border:2px solid rgba(0,0,0,0.3);border-top-color:#000;border-radius:50%;animation:spin 0.7s linear infinite;display:inline-block;}
+.spinner-light{border:2px solid var(--border);border-top-color:var(--green);}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* FEEDBACK */
+.feedback-box{border-radius:8px;padding:12px 14px;font-size:13px;margin-top:12px;display:none;}
+.feedback-box.show{display:block;}
+.fb-green{background:var(--green-dim);border:1px solid rgba(0,230,118,0.3);}
+.fb-red{background:var(--red-dim);border:1px solid rgba(255,68,68,0.3);color:var(--red);}
+
+/* PROGRESS RING */
+.progress-ring{position:relative;width:100px;height:100px;margin:0 auto 12px;}
+.progress-ring svg{transform:rotate(-90deg);}
+.ring-val{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-family:var(--font-head);font-weight:800;}
+
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:transparent;}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:3px;}
+.divider{height:1px;background:var(--border);margin:16px 0;}
+</style>
+</head>
+<body>
+
+<!-- TOPBAR -->
+<div class="topbar">
+  <div class="logo"><div class="logo-dot"></div>Kenya<span>Watch</span> AI</div>
+  <div class="status-bar">
+    <div class="status-item"><div class="status-dot s-live"></div>LIVE</div>
+    <div class="status-item"><div class="status-dot s-alert"></div><span id="flag-count">--</span> FLAGS</div>
+    <div class="status-item" style="color:var(--text2)" id="clock-el">--:--:-- EAT</div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav>
+  <button class="nav-btn active" onclick="showView('dashboard')">⬛ Overview</button>
+  <button class="nav-btn" onclick="showView('procurement')">📋 Procurement</button>
+  <button class="nav-btn" onclick="showView('ghost')">👻 Ghost Projects</button>
+  <button class="nav-btn" onclick="showView('report')">🚨 Report</button>
+  <button class="nav-btn" onclick="showView('ai')">🤖 AI Investigator</button>
+  <button class="nav-btn" onclick="showView('about')">ℹ About</button>
+</nav>
+
+<!-- ═══════ DASHBOARD ═══════ -->
+<div id="view-dashboard" class="view active">
+  <div class="banner">
+    <span style="font-size:18px">⚡</span>
+    <div>AI is actively monitoring procurement contracts, satellite imagery, and citizen reports across all 47 counties.
+    <a href="#" onclick="showView('procurement');return false;" style="color:var(--green);margin-left:8px;">View flags →</a></div>
+  </div>
+
+  <div class="section-header">
+    <div><div class="section-title">Intelligence Overview</div><div class="section-sub">Real-time corruption monitoring across Kenya</div></div>
+    <div class="tag tag-green" id="dash-updated">Loading...</div>
+  </div>
+
+  <div class="stats-grid">
+    <div class="stat-card c-red"><div class="stat-label">Contracts Flagged</div><div class="stat-value red" id="s-flagged">--</div><div class="stat-delta">High-risk active</div></div>
+    <div class="stat-card c-amber"><div class="stat-label">Ghost Projects</div><div class="stat-value amber" id="s-ghost">--</div><div class="stat-delta">Satellite detected</div></div>
+    <div class="stat-card c-green"><div class="stat-label">Reports (30 days)</div><div class="stat-value green" id="s-reports">--</div><div class="stat-delta">From citizens</div></div>
+    <div class="stat-card c-blue"><div class="stat-label">Funds at Risk (KES)</div><div class="stat-value blue" id="s-funds">--</div><div class="stat-delta">Under investigation</div></div>
+  </div>
+
+  <div class="grid-60-40" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">🗺 Corruption Risk by County</div>
+      <div class="county-list">
+        <div class="county-item"><div class="county-name">Nairobi</div><div class="county-bar-wrap"><div class="county-bar rb-high" style="width:0" data-w="92%"></div></div><div class="county-val">92</div></div>
+        <div class="county-item"><div class="county-name">Kiambu</div><div class="county-bar-wrap"><div class="county-bar rb-high" style="width:0" data-w="87%"></div></div><div class="county-val">87</div></div>
+        <div class="county-item"><div class="county-name">Mombasa</div><div class="county-bar-wrap"><div class="county-bar rb-high" style="width:0" data-w="81%"></div></div><div class="county-val">81</div></div>
+        <div class="county-item"><div class="county-name">Nakuru</div><div class="county-bar-wrap"><div class="county-bar rb-med" style="width:0" data-w="68%"></div></div><div class="county-val">68</div></div>
+        <div class="county-item"><div class="county-name">Kakamega</div><div class="county-bar-wrap"><div class="county-bar rb-med" style="width:0" data-w="61%"></div></div><div class="county-val">61</div></div>
+        <div class="county-item"><div class="county-name">Kisumu</div><div class="county-bar-wrap"><div class="county-bar rb-med" style="width:0" data-w="55%"></div></div><div class="county-val">55</div></div>
+        <div class="county-item"><div class="county-name">Kisii</div><div class="county-bar-wrap"><div class="county-bar rb-low" style="width:0" data-w="38%"></div></div><div class="county-val">38</div></div>
+        <div class="county-item"><div class="county-name">Turkana</div><div class="county-bar-wrap"><div class="county-bar rb-low" style="width:0" data-w="29%"></div></div><div class="county-val">29</div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📡 Live Activity Feed</div>
+      <div id="live-feed">
+        <div class="feed-item"><div class="feed-icon fi-red">🚨</div><div><div class="feed-title">High-risk tender flagged: Road KES 450M</div><div class="feed-meta">NAIROBI · 2 min ago · AI SCORE: 94</div></div></div>
+        <div class="feed-item"><div class="feed-icon fi-amber">⚠️</div><div><div class="feed-title">Ghost school project detected in Kiambu</div><div class="feed-meta">KIAMBU · 18 min ago · SATELLITE</div></div></div>
+        <div class="feed-item"><div class="feed-icon fi-blue">👤</div><div><div class="feed-title">Anonymous report: Bribery at licensing office</div><div class="feed-meta">MOMBASA · 34 min ago · CITIZEN</div></div></div>
+        <div class="feed-item"><div class="feed-icon fi-amber">⚠️</div><div><div class="feed-title">Supplier awarded 4 contracts — no bid</div><div class="feed-meta">NAKURU · 1hr ago · AI PATTERN</div></div></div>
+        <div class="feed-item"><div class="feed-icon fi-green">✅</div><div><div class="feed-title">Investigation closed — funds recovered, Nyeri</div><div class="feed-meta">NYERI · 3hr ago · RESOLVED</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-3">
+    <div class="card" style="text-align:center;">
+      <div class="card-title" style="justify-content:center;">AI Detection Rate</div>
+      <div class="progress-ring"><svg width="100" height="100"><circle cx="50" cy="50" r="42" fill="none" stroke="#1f2a2d" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--green)" stroke-width="8" stroke-dasharray="263.9" stroke-dashoffset="263.9" id="ring1" stroke-linecap="round"/></svg><div class="ring-val"><span style="font-size:20px;color:var(--green)" id="r1v">0%</span><span style="font-size:9px;color:var(--text3);font-family:var(--font-mono)">accuracy</span></div></div>
+      <div style="color:var(--text2);font-size:12px;">Model trained on 12,000+ Kenyan procurement records</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="card-title" style="justify-content:center;">Cases This Month</div>
+      <div class="progress-ring"><svg width="100" height="100"><circle cx="50" cy="50" r="42" fill="none" stroke="#1f2a2d" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--amber)" stroke-width="8" stroke-dasharray="263.9" stroke-dashoffset="263.9" id="ring2" stroke-linecap="round"/></svg><div class="ring-val"><span style="font-size:20px;color:var(--amber)" id="r2v">0</span><span style="font-size:9px;color:var(--text3);font-family:var(--font-mono)">opened</span></div></div>
+      <div style="color:var(--text2);font-size:12px;">34 referred to EACC for investigation</div>
+    </div>
+    <div class="card" style="text-align:center;">
+      <div class="card-title" style="justify-content:center;">Funds Saved (2025)</div>
+      <div class="progress-ring"><svg width="100" height="100"><circle cx="50" cy="50" r="42" fill="none" stroke="#1f2a2d" stroke-width="8"/><circle cx="50" cy="50" r="42" fill="none" stroke="var(--blue)" stroke-width="8" stroke-dasharray="263.9" stroke-dashoffset="263.9" id="ring3" stroke-linecap="round"/></svg><div class="ring-val"><span style="font-size:20px;color:var(--blue)" id="r3v">0B</span><span style="font-size:9px;color:var(--text3);font-family:var(--font-mono)">KES</span></div></div>
+      <div style="color:var(--text2);font-size:12px;">Through automated procurement blocking</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ PROCUREMENT ═══════ -->
+<div id="view-procurement" class="view">
+  <div class="section-header">
+    <div><div class="section-title">Procurement Scanner</div><div class="section-sub">AI-powered risk scoring of government tenders</div></div>
+    <button class="btn btn-green" onclick="openModal('scan-modal')">+ Scan Contract</button>
+  </div>
+
+  <div class="card" style="margin-bottom:20px;overflow-x:auto;">
+    <div class="card-title">⚠️ High-Risk Contracts</div>
+    <table class="risk-table" id="contracts-table">
+      <thead><tr><th>Contract ID</th><th>Description</th><th>County</th><th>Value (KES)</th><th>Supplier</th><th>AI Score</th><th>Action</th></tr></thead>
+      <tbody id="contracts-tbody"><tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3);font-family:var(--font-mono);font-size:12px;">Loading contracts...</td></tr></tbody>
+    </table>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">🔍 AI Fraud Patterns</div>
+      <div class="timeline">
+        <div class="tl-item"><div class="tl-dot tl-dot-red"></div><div class="tl-title">Single-source award pattern</div><div class="tl-meta">Nexus Build Ltd — 6 contracts, no competitive bidding</div><div class="bar-wrap"><div class="bar rb-high" style="width:92%"></div></div></div>
+        <div class="tl-item"><div class="tl-dot tl-dot-red"></div><div class="tl-title">Political connection network</div><div class="tl-meta">Director linked to 2 senior county officials</div><div class="bar-wrap"><div class="bar rb-high" style="width:88%"></div></div></div>
+        <div class="tl-item"><div class="tl-dot tl-dot-amber"></div><div class="tl-title">Price benchmarking anomaly</div><div class="tl-meta">EduSupply Co. priced 340% above market rate</div><div class="bar-wrap"><div class="bar rb-med" style="width:68%"></div></div></div>
+        <div class="tl-item"><div class="tl-dot tl-dot-amber"></div><div class="tl-title">Duplicate supplier identifiers</div><div class="tl-meta">MedKe address matches 3 other flagged firms</div><div class="bar-wrap"><div class="bar rb-med" style="width:55%"></div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">📊 Risk Distribution</div>
+      <div id="risk-dist-content" style="color:var(--text3);font-size:13px;">Loading...</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ GHOST PROJECTS ═══════ -->
+<div id="view-ghost" class="view">
+  <div class="section-header">
+    <div><div class="section-title">Ghost Project Detector</div><div class="section-sub">AI + satellite imagery cross-referencing funded projects vs. ground reality</div></div>
+    <div class="tag tag-amber" id="ghost-count-tag">Loading...</div>
+  </div>
+  <div class="grid-3" id="ghost-grid" style="margin-bottom:20px;">
+    <div style="color:var(--text3);font-size:13px;font-family:var(--font-mono);">Loading...</div>
+  </div>
+  <div class="card">
+    <div class="card-title">🛰 How Satellite AI Detection Works</div>
+    <div class="grid-3">
+      <div style="text-align:center;padding:16px 8px;"><div style="font-size:28px;margin-bottom:10px;">🛰️</div><div style="font-family:var(--font-mono);font-size:11px;color:var(--green);margin-bottom:6px;">STEP 1 · INGEST</div><div style="font-size:13px;color:var(--text2);">Sentinel-2 satellite images fetched for each funded project GPS coordinate every 30 days</div></div>
+      <div style="text-align:center;padding:16px 8px;border-left:1px solid var(--border);border-right:1px solid var(--border);"><div style="font-size:28px;margin-bottom:10px;">🧠</div><div style="font-family:var(--font-mono);font-size:11px;color:var(--amber);margin-bottom:6px;">STEP 2 · ANALYSE</div><div style="font-size:13px;color:var(--text2);">AI vision model compares image vs. contract description — classifies as Built / Partial / Ghost</div></div>
+      <div style="text-align:center;padding:16px 8px;"><div style="font-size:28px;margin-bottom:10px;">🚨</div><div style="font-family:var(--font-mono);font-size:11px;color:var(--red);margin-bottom:6px;">STEP 3 · ALERT</div><div style="font-size:13px;color:var(--text2);">Discrepancies auto-escalated to EACC, journalists, and county assembly oversight committee</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ REPORT ═══════ -->
+<div id="view-report" class="view">
+  <div class="section-header">
+    <div><div class="section-title">Report Corruption</div><div class="section-sub">Anonymous, encrypted, AI-verified reporting for every Kenyan citizen</div></div>
+    <div class="tag tag-green">END-TO-END ENCRYPTED</div>
+  </div>
+  <div class="grid-60-40">
+    <div class="card">
+      <div class="card-title">🔐 Submit a Report</div>
+      <div class="form-group"><label class="form-label">Type of Corruption</label>
+        <select class="form-select" id="r-type">
+          <option value="">— Select type —</option>
+          <option>Bribery / Kickbacks</option><option>Ghost project / Fake delivery</option>
+          <option>Procurement fraud</option><option>Embezzlement of public funds</option>
+          <option>Nepotism / Political appointments</option><option>Police extortion</option>
+          <option>Land grabbing</option><option>Other</option>
+        </select>
+      </div>
+      <div class="grid-2" style="gap:12px;">
+        <div class="form-group"><label class="form-label">County</label>
+          <select class="form-select" id="r-county">
+            <option value="">— Select —</option>
+            <option>Nairobi</option><option>Mombasa</option><option>Kisumu</option>
+            <option>Nakuru</option><option>Kiambu</option><option>Kisii</option>
+            <option>Kakamega</option><option>Machakos</option><option>Other</option>
+          </select>
+        </div>
+        <div class="form-group"><label class="form-label">Government Sector</label>
+          <select class="form-select" id="r-sector">
+            <option value="">— Select —</option>
+            <option>Health</option><option>Education</option><option>Roads & Infrastructure</option>
+            <option>Water & Sanitation</option><option>Police & Security</option><option>Lands</option><option>Other</option>
+          </select>
+        </div>
+      </div>
+      <div class="form-group"><label class="form-label">Describe what happened</label>
+        <textarea class="form-textarea" id="r-desc" placeholder="Describe the incident. Include dates, amounts, names of officials if known. Your identity is fully protected."></textarea>
+      </div>
+      <div class="form-group"><label class="form-label">Estimated Amount (KES) — optional</label>
+        <input type="number" class="form-input" id="r-amount" placeholder="e.g. 500000">
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:16px;">
+        <input type="checkbox" id="r-anon" checked style="accent-color:var(--green);">
+        <label for="r-anon" style="font-size:13px;color:var(--text2);cursor:pointer;">Submit anonymously (identity never stored)</label>
+      </div>
+      <button class="btn btn-green" onclick="submitReport()" id="submit-btn">Submit Report Securely</button>
+      <div class="feedback-box" id="submit-feedback"></div>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">🤖 What AI Does With Your Report</div>
+        <div style="font-size:13px;color:var(--text2);line-height:1.8;display:flex;flex-direction:column;gap:8px;">
+          <div>✅ Strips all personally identifying info</div>
+          <div>✅ Scores the report for credibility (0–100)</div>
+          <div>✅ Cross-references existing case database</div>
+          <div>✅ Routes to EACC, DPP, or PPRA as appropriate</div>
+          <div>✅ Issues a unique tracking case number</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">📊 Recent Reports</div>
+        <div id="reports-feed">
+          <div style="font-size:13px;color:var(--text3);font-family:var(--font-mono);">Loading...</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ AI INVESTIGATOR ═══════ -->
+<div id="view-ai" class="view">
+  <div class="section-header">
+    <div><div class="section-title">AI Corruption Investigator</div><div class="section-sub">Ask anything about procurement, contracts, or corruption in Kenya</div></div>
+    <div class="tag tag-blue">CLAUDE AI</div>
+  </div>
+  <div class="grid-60-40">
+    <div class="card" style="padding:0;overflow:hidden;">
+      <div class="chat-container">
+        <div class="chat-messages" id="chat-msgs">
+          <div><div class="msg-label">KENYAWATCH AI</div>
+          <div class="msg msg-ai"><strong>Habari!</strong> I'm KenyaWatch AI, your anti-corruption intelligence assistant.<br><br>I can help you analyse contracts, investigate supplier networks, understand county-level corruption patterns, and tell you exactly what action to take.<br><br>What would you like to investigate?</div></div>
+        </div>
+        <div class="typing-indicator" id="typing"><div class="typing-dot"></div><div class="typing-dot"></div><div class="typing-dot"></div><span style="font-size:11px;color:var(--text3);font-family:var(--font-mono)">Thinking...</span></div>
+        <div class="chat-input-row">
+          <input class="chat-input" id="chat-input" placeholder="Ask about any contract, county, or corruption case..." onkeydown="if(event.key==='Enter'&&!event.shiftKey){event.preventDefault();sendChat();}">
+          <button class="btn btn-green" onclick="sendChat()">Send</button>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:16px;">
+      <div class="card">
+        <div class="card-title">⚡ Quick Queries</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <button class="btn btn-outline" style="text-align:left;padding:10px 14px;font-size:11px;" onclick="quickQ('What are the highest risk procurement contracts in Nairobi right now?')">Top risk contracts in Nairobi →</button>
+          <button class="btn btn-outline" style="text-align:left;padding:10px 14px;font-size:11px;" onclick="quickQ('How does satellite AI detect ghost projects in Kenya?')">How ghost project detection works →</button>
+          <button class="btn btn-outline" style="text-align:left;padding:10px 14px;font-size:11px;" onclick="quickQ('Which government sectors in Kenya have the most corruption cases?')">Most corrupt sectors in Kenya →</button>
+          <button class="btn btn-outline" style="text-align:left;padding:10px 14px;font-size:11px;" onclick="quickQ('What should I do if I witness a government official accepting a bribe in Kenya?')">What to do if you witness bribery →</button>
+          <button class="btn btn-outline" style="text-align:left;padding:10px 14px;font-size:11px;" onclick="quickQ('Explain how AI detects collusion between suppliers in Kenya procurement tenders')">How AI detects supplier collusion →</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-title">🏛 Oversight Bodies</div>
+        <div style="display:flex;flex-direction:column;gap:10px;font-size:13px;">
+          <div style="padding:10px;background:var(--bg3);border-radius:8px;"><div style="font-weight:500;margin-bottom:2px;">EACC</div><div style="color:var(--text3);font-size:11px;">Ethics & Anti-Corruption Commission · 0800 720 880</div></div>
+          <div style="padding:10px;background:var(--bg3);border-radius:8px;"><div style="font-weight:500;margin-bottom:2px;">DPP</div><div style="color:var(--text3);font-size:11px;">Director of Public Prosecutions · corruption@dpp.go.ke</div></div>
+          <div style="padding:10px;background:var(--bg3);border-radius:8px;"><div style="font-weight:500;margin-bottom:2px;">PPRA</div><div style="color:var(--text3);font-size:11px;">Public Procurement Regulatory Authority · ppra.go.ke</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════ ABOUT ═══════ -->
+<div id="view-about" class="view">
+  <div class="section-header">
+    <div><div class="section-title">About KenyaWatch AI</div><div class="section-sub">Open-source AI platform for anti-corruption in Kenya</div></div>
+    <div class="tag tag-green">HACKATHON 2026</div>
+  </div>
+  <div class="grid-2" style="margin-bottom:20px;">
+    <div class="card"><div class="card-title">🎯 The Problem</div><div style="font-size:14px;color:var(--text2);line-height:1.8;">Corruption costs Kenya an estimated <strong style="color:var(--red)">KES 500 billion annually</strong> — roughly 30% of the national budget. Public procurement accounts for 60% of government spending, making it the single greatest corruption vulnerability. Manual audit systems cannot keep pace with modern financial fraud.</div></div>
+    <div class="card"><div class="card-title">💡 Our Solution</div><div style="font-size:14px;color:var(--text2);line-height:1.8;">KenyaWatch AI combines <strong style="color:var(--green)">ML fraud detection</strong>, <strong style="color:var(--blue)">satellite image verification</strong>, and <strong style="color:var(--amber)">citizen reporting</strong> into a single real-time intelligence platform — empowering oversight bodies, journalists, and citizens to identify and act on corruption at scale.</div></div>
+  </div>
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-title">🏗 Tech Stack</div>
+    <div class="grid-3">
+      <div style="padding:16px;background:var(--bg3);border-radius:10px;"><div style="font-family:var(--font-mono);font-size:11px;color:var(--green);margin-bottom:8px;">BACKEND</div><div style="font-size:13px;color:var(--text2);line-height:1.7;">Node.js + Express on Railway. PostgreSQL database. Anthropic Claude API for AI chat. Rate limiting & helmet security.</div></div>
+      <div style="padding:16px;background:var(--bg3);border-radius:10px;"><div style="font-family:var(--font-mono);font-size:11px;color:var(--blue);margin-bottom:8px;">FRONTEND</div><div style="font-size:13px;color:var(--text2);line-height:1.7;">Vanilla HTML/CSS/JS served via Express on Railway. Calls backend API. Zero frameworks — fast, lightweight, deployable anywhere.</div></div>
+      <div style="padding:16px;background:var(--bg3);border-radius:10px;"><div style="font-family:var(--font-mono);font-size:11px;color:var(--amber);margin-bottom:8px;">DATA</div><div style="font-size:13px;color:var(--text2);line-height:1.7;">Kenya e-GP, PPIP portal, KRA iTax registry, Sentinel-2 satellite API, EACC public database & citizen reports.</div></div>
+    </div>
+  </div>
+  <div class="card">
+    <div class="card-title">🧑‍💻 Built By</div>
+    <div style="display:flex;align-items:center;gap:20px;padding:8px 0;">
+      <div style="width:56px;height:56px;background:var(--green-dim);border:1px solid var(--green);border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:24px;">🧑‍💻</div>
+      <div>
+        <div style="font-family:var(--font-head);font-size:20px;font-weight:800;">Douglas Mwebi (Daggy)</div>
+        <div style="color:var(--text2);font-size:13px;margin-top:2px;">Daggy Techs · Kisii, Kenya</div>
+        <div style="display:flex;gap:8px;margin-top:8px;flex-wrap:wrap;">
+          <span class="badge b-green">daggytechs@gmail.com</span>
+          <span class="badge b-blue">+254 796 820 013</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCAN MODAL -->
+<div class="modal-overlay" id="scan-modal">
+  <div class="modal">
+    <div class="modal-header"><div class="modal-title">Scan Contract for Fraud</div><button class="modal-close" onclick="closeModal('scan-modal')">✕</button></div>
+    <div class="form-group"><label class="form-label">Contract ID</label><input class="form-input" id="m-id" placeholder="e.g. KE-PRO-2026-0500"></div>
+    <div class="form-group"><label class="form-label">Supplier Name</label><input class="form-input" id="m-supplier" placeholder="Company name as registered"></div>
+    <div class="form-group"><label class="form-label">Description</label><input class="form-input" id="m-desc" placeholder="Brief contract description"></div>
+    <div class="form-group"><label class="form-label">Contract Value (KES)</label><input type="number" class="form-input" id="m-value" placeholder="e.g. 45000000"></div>
+    <div class="form-group"><label class="form-label">County</label>
+      <select class="form-select" id="m-county"><option>Nairobi</option><option>Mombasa</option><option>Kisumu</option><option>Nakuru</option><option>Kiambu</option><option>Kisii</option><option>Other</option></select>
+    </div>
+    <button class="btn btn-green" onclick="runScan()" id="scan-btn" style="width:100%;justify-content:center;">Run AI Scan</button>
+    <div class="feedback-box" id="scan-feedback"></div>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ──────────────────────────────────────────────────────────────────
+// In production, BACKEND_URL is set to the deployed Railway backend URL via window.ENV
+const API = (window.ENV && window.ENV.BACKEND_URL) ? window.ENV.BACKEND_URL : '';
+
+// ── NAV ──────────────────────────────────────────────────────────────────────
+function showView(id) {
+  document.querySelectorAll('.view').forEach(v => v.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('view-' + id).classList.add('active');
+  const idx = ['dashboard','procurement','ghost','report','ai','about'].indexOf(id);
+  document.querySelectorAll('.nav-btn')[idx].classList.add('active');
+  if (id === 'procurement') loadContracts();
+  if (id === 'ghost') loadGhostProjects();
+  if (id === 'report') loadReportsFeed();
+}
+
+// ── CLOCK ────────────────────────────────────────────────────────────────────
+setInterval(() => {
+  document.getElementById('clock-el').textContent =
+    new Date().toLocaleTimeString('en-KE', {hour12:false}) + ' EAT';
+}, 1000);
+
+// ── API HELPERS ───────────────────────────────────────────────────────────────
+async function apiFetch(path, opts={}) {
+  const res = await fetch(API + path, {
+    headers: {'Content-Type':'application/json'},
+    ...opts
+  });
+  return res.json();
+}
+
+// ── DASHBOARD STATS ───────────────────────────────────────────────────────────
+async function loadStats() {
+  try {
+    const { data } = await apiFetch('/api/stats');
+    animCount('s-flagged', data.contracts_flagged || 0);
+    animCount('s-ghost', data.ghost_projects || 0);
+    animCount('s-reports', data.reports_30d || 0);
+    document.getElementById('s-funds').textContent = fmtKES(data.funds_at_risk || 0);
+    document.getElementById('flag-count').textContent = (data.contracts_flagged || 0) + ' FLAGS';
+    document.getElementById('dash-updated').textContent = 'Updated ' + new Date().toLocaleTimeString('en-KE',{hour12:false});
+  } catch {
+    ['s-flagged','s-ghost','s-reports'].forEach(id => document.getElementById(id).textContent = '--');
+  }
+}
+
+function fmtKES(n) {
+  if (n >= 1e9) return (n/1e9).toFixed(1) + 'B';
+  if (n >= 1e6) return (n/1e6).toFixed(0) + 'M';
+  return n.toLocaleString();
+}
+
+function animCount(id, target) {
+  let v = 0; const el = document.getElementById(id);
+  const step = Math.max(1, target / 50);
+  const t = setInterval(() => {
+    v = Math.min(v + step, target);
+    el.textContent = Math.floor(v);
+    if (v >= target) clearInterval(t);
+  }, 20);
+}
+
+// ── COUNTY BARS ───────────────────────────────────────────────────────────────
+setTimeout(() => {
+  document.querySelectorAll('.county-bar[data-w]').forEach(b => {
+    b.style.width = b.getAttribute('data-w');
+  });
+}, 400);
+
+// ── RINGS ─────────────────────────────────────────────────────────────────────
+function animRing(id, valId, pct, fmt) {
+  const c = 263.9, ring = document.getElementById(id), val = document.getElementById(valId);
+  let cur = 0;
+  const t = setInterval(() => {
+    cur = Math.min(cur + pct/60, pct);
+    ring.style.strokeDashoffset = c - c * cur/100;
+    val.textContent = fmt(cur);
+    if (cur >= pct) clearInterval(t);
+  }, 16);
+}
+setTimeout(() => {
+  animRing('ring1','r1v',91,v => Math.floor(v)+'%');
+  animRing('ring2','r2v',100,v => Math.floor(v*1.56)+'');
+  animRing('ring3','r3v',100,v => (v/100*1.2).toFixed(1)+'B');
+}, 500);
+
+// ── CONTRACTS ─────────────────────────────────────────────────────────────────
+async function loadContracts() {
+  const tbody = document.getElementById('contracts-tbody');
+  try {
+    const { data } = await apiFetch('/api/contracts');
+    if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--text3);font-size:12px;">No contracts found.</td></tr>'; return; }
+
+    tbody.innerHTML = data.map(c => {
+      const cls = c.risk_level==='HIGH'?'rs-high':c.risk_level==='MEDIUM'?'rs-med':'rs-low';
+      const flags = Array.isArray(c.flags) ? c.flags : JSON.parse(c.flags||'[]');
+      const badgeCls = c.risk_level==='HIGH'?'b-red':c.risk_level==='MEDIUM'?'b-amber':'b-green';
+      const flagHtml = flags.slice(0,2).map(f=>`<span class="badge ${badgeCls}" style="margin:1px;display:inline-block;">${f}</span>`).join('');
+      return `<tr>
+        <td style="font-family:var(--font-mono);font-size:11px;color:var(--text3)">${c.contract_id}</td>
+        <td>${c.description}</td>
+        <td>${c.county||'—'}</td>
+        <td>${parseInt(c.value||0).toLocaleString()}</td>
+        <td>${c.supplier}</td>
+        <td><span class="risk-score ${cls}">${c.risk_score} / ${c.risk_level}</span></td>
+        <td>${flagHtml}</td>
+      </tr>`;
+    }).join('');
+
+    // Risk distribution
+    const high = data.filter(c=>c.risk_level==='HIGH').length;
+    const med = data.filter(c=>c.risk_level==='MEDIUM').length;
+    const low = data.filter(c=>c.risk_level==='LOW').length;
+    const total = data.length;
+    document.getElementById('risk-dist-content').innerHTML = `
+      <div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;"><span style="color:var(--red)">● High Risk</span><span style="font-family:var(--font-mono)">${high} (${Math.round(high/total*100)}%)</span></div><div class="bar-wrap" style="height:10px;"><div class="bar rb-high" style="width:${high/total*100}%"></div></div></div>
+      <div style="margin-bottom:16px;"><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;"><span style="color:var(--amber)">● Medium Risk</span><span style="font-family:var(--font-mono)">${med} (${Math.round(med/total*100)}%)</span></div><div class="bar-wrap" style="height:10px;"><div class="bar rb-med" style="width:${med/total*100}%"></div></div></div>
+      <div><div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:13px;"><span style="color:var(--green)">● Low Risk</span><span style="font-family:var(--font-mono)">${low} (${Math.round(low/total*100)}%)</span></div><div class="bar-wrap" style="height:10px;"><div class="bar rb-low" style="width:${low/total*100}%"></div></div></div>
+      <div class="divider"></div><div style="font-size:12px;color:var(--text2);">AI monitors <strong style="color:var(--text)">${total} active contracts</strong> across all counties.</div>`;
+  } catch (err) {
+    tbody.innerHTML = `<tr><td colspan="7" style="text-align:center;padding:20px;color:var(--red);font-size:12px;">Failed to load contracts. Check backend connection.</td></tr>`;
+  }
+}
+
+// ── GHOST PROJECTS ────────────────────────────────────────────────────────────
+async function loadGhostProjects() {
+  const grid = document.getElementById('ghost-grid');
+  try {
+    const { data } = await apiFetch('/api/ghost-projects');
+    const statsRes = await apiFetch('/api/ghost-projects/meta/stats');
+    const active = statsRes.data ? (parseInt(statsRes.data.ghost_count)+parseInt(statsRes.data.partial_count)) : '?';
+    document.getElementById('ghost-count-tag').textContent = active + ' ACTIVE FLAGS';
+
+    if (!data || !data.length) { grid.innerHTML = '<div style="color:var(--text3);font-size:13px;">No ghost projects recorded.</div>'; return; }
+
+    grid.innerHTML = data.map(p => {
+      const s = p.detection_status;
+      const badgeCls = s==='ghost'?'b-red':s==='partial'?'b-amber':'b-green';
+      const badgeLabel = s==='ghost'?'GHOST':s==='partial'?'PARTIAL':'VERIFIED';
+      const bgColor = s==='ghost'?'#1a0800':s==='partial'?'#1a1200':'#001a0a';
+      const strokeColor = s==='ghost'?'#ff4444':s==='partial'?'#ffb300':'#00e676';
+      const satText = s==='ghost'?'Empty land detected':s==='partial'?'~15% complete':'Structure confirmed';
+      const amtColor = s==='verified'?'var(--green)':s==='partial'?'var(--amber)':'var(--red)';
+      return `<div class="gp-card">
+        <div class="gp-img" style="background:${bgColor};">
+          <svg width="100%" height="120" viewBox="0 0 300 120">
+            <rect width="300" height="120" fill="${bgColor}"/>
+            <rect x="30" y="20" width="240" height="80" rx="4" fill="none" stroke="${strokeColor}" stroke-width="0.8" stroke-dasharray="5"/>
+            <text x="150" y="55" text-anchor="middle" fill="${strokeColor}" font-size="11" font-family="Space Mono">SATELLITE VIEW</text>
+            <text x="150" y="73" text-anchor="middle" fill="#666" font-size="10" font-family="Space Mono">${satText}</text>
+          </svg>
+          <div style="position:absolute;top:8px;right:8px;"><span class="badge ${badgeCls}">${badgeLabel}</span></div>
+        </div>
+        <div class="gp-body">
+          <div class="gp-name">${p.project_name}</div>
+          <div class="gp-meta">${p.contract_ref||'N/A'} · ${p.county||'KENYA'}</div>
+          <div class="gp-compare">
+            <div class="gp-col"><div class="gp-col-label">Claimed</div><div>${p.claimed_status}</div></div>
+            <div class="gp-col"><div class="gp-col-label">Satellite</div><div>${p.satellite_status}</div></div>
+          </div>
+          <div style="margin-top:10px;display:flex;justify-content:space-between;align-items:center;">
+            <span style="font-family:var(--font-mono);font-size:11px;color:${amtColor}">KES ${parseInt(p.amount_at_risk||0).toLocaleString()}</span>
+            ${s!=='verified'?`<button class="btn btn-red" style="padding:6px 12px;font-size:10px;">Report to EACC</button>`:`<span class="badge b-green">CLEAN</span>`}
+          </div>
+        </div>
+      </div>`;
+    }).join('');
+  } catch {
+    grid.innerHTML = '<div style="color:var(--red);font-size:13px;">Failed to load ghost projects.</div>';
+  }
+}
+
+// ── REPORTS FEED ──────────────────────────────────────────────────────────────
+async function loadReportsFeed() {
+  const feed = document.getElementById('reports-feed');
+  try {
+    const { data } = await apiFetch('/api/reports');
+    if (!data || !data.length) { feed.innerHTML = '<div style="font-size:13px;color:var(--text3);">No reports yet. Be the first.</div>'; return; }
+    feed.innerHTML = data.slice(0,5).map(r => {
+      const cls = r.status==='resolved'?'b-green':r.status==='pending'?'b-amber':'b-blue';
+      return `<div class="feed-item">
+        <div><span class="badge ${cls}">${(r.type||'REPORT').toUpperCase().slice(0,12)}</span></div>
+        <div><div class="feed-title">${r.county||'Kenya'} · ${r.sector||'Government'}</div>
+        <div class="feed-meta">${r.case_number} · ${r.status.toUpperCase()} · Score: ${r.ai_credibility_score}</div></div>
+      </div>`;
+    }).join('');
+  } catch {
+    feed.innerHTML = '<div style="font-size:13px;color:var(--text3);">Could not load reports.</div>';
+  }
+}
+
+// ── REPORT SUBMIT ─────────────────────────────────────────────────────────────
+async function submitReport() {
+  const type = document.getElementById('r-type').value;
+  const desc = document.getElementById('r-desc').value.trim();
+  const fb = document.getElementById('submit-feedback');
+  if (!type || !desc) { showFb(fb,'Please fill in type and description.','red'); return; }
+
+  const btn = document.getElementById('submit-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Submitting...';
+
+  try {
+    const { data, success, error } = await apiFetch('/api/reports', {
+      method: 'POST',
+      body: JSON.stringify({
+        type, county: document.getElementById('r-county').value,
+        sector: document.getElementById('r-sector').value,
+        description: desc,
+        amount: document.getElementById('r-amount').value || null,
+        anonymous: document.getElementById('r-anon').checked
+      })
+    });
+    if (success) {
+      showFb(fb, `✅ Report submitted. Case number: <strong style="color:var(--green)">${data.case_number}</strong>. Routed to EACC for review. Thank you for fighting corruption.`, 'green');
+      document.getElementById('r-desc').value = '';
+    } else {
+      showFb(fb, '❌ Error: ' + error, 'red');
+    }
+  } catch {
+    showFb(fb, '❌ Network error. Please try again.', 'red');
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Submit Report Securely';
+}
+
+function showFb(el, msg, type) {
+  el.className = 'feedback-box show ' + (type==='green'?'fb-green':'fb-red');
+  el.innerHTML = msg;
+}
+
+// ── SCAN CONTRACT ─────────────────────────────────────────────────────────────
+async function runScan() {
+  const id = document.getElementById('m-id').value.trim();
+  const supplier = document.getElementById('m-supplier').value.trim();
+  const value = document.getElementById('m-value').value;
+  const fb = document.getElementById('scan-feedback');
+  if (!id || !supplier || !value) { showFb(fb,'Fill in Contract ID, Supplier, and Value.','red'); return; }
+
+  const btn = document.getElementById('scan-btn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span> Analysing...';
+
+  try {
+    const { data, success, error } = await apiFetch('/api/contracts/scan', {
+      method: 'POST',
+      body: JSON.stringify({
+        contract_id: id, supplier,
+        description: document.getElementById('m-desc').value || 'N/A',
+        county: document.getElementById('m-county').value,
+        value: parseInt(value)
+      })
+    });
+    if (success) {
+      const cls = data.risk_level==='HIGH'?'rs-high':data.risk_level==='MEDIUM'?'rs-med':'rs-low';
+      const flags = Array.isArray(data.flags)?data.flags:JSON.parse(data.flags||'[]');
+      showFb(fb, `
+        <div style="margin-bottom:10px;"><span class="risk-score ${cls}">AI SCORE: ${data.risk_score} / ${data.risk_level}</span></div>
+        <div style="font-size:13px;color:var(--text2);margin-bottom:6px;">Flags detected:</div>
+        ${flags.map(f=>`<div style="font-size:12px;padding:3px 0;color:var(--text);">• ${f}</div>`).join('')||'<div style="font-size:12px;color:var(--green)">No flags detected.</div>'}
+        <div style="margin-top:10px;font-size:12px;color:var(--text3);">Contract saved to database.</div>
+      `, 'green');
+      loadContracts();
+    } else {
+      showFb(fb, '❌ ' + error, 'red');
+    }
+  } catch {
+    showFb(fb, '❌ Network error. Check backend connection.', 'red');
+  }
+  btn.disabled = false;
+  btn.innerHTML = 'Run AI Scan';
+}
+
+// ── AI CHAT ───────────────────────────────────────────────────────────────────
+const SESSION_ID = 'sess_' + Math.random().toString(36).slice(2);
+
+async function sendChat() {
+  const input = document.getElementById('chat-input');
+  const msgs = document.getElementById('chat-msgs');
+  const text = input.value.trim();
+  if (!text) return;
+  input.value = '';
+
+  appendMsg('user', text);
+  document.getElementById('typing').classList.add('show');
+  msgs.scrollTop = msgs.scrollHeight;
+
+  try {
+    const { reply, success, error } = await apiFetch('/api/ai/chat', {
+      method: 'POST',
+      body: JSON.stringify({ message: text, session_id: SESSION_ID })
+    });
+    document.getElementById('typing').classList.remove('show');
+    appendMsg('ai', (success ? reply : (error||'Error')).replace(/\*\*(.*?)\*\*/g,'<strong>$1</strong>').replace(/\n/g,'<br>'));
+  } catch {
+    document.getElementById('typing').classList.remove('show');
+    appendMsg('ai','<strong>Connection error.</strong> Please check your internet connection and try again.');
+  }
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function appendMsg(role, text) {
+  const msgs = document.getElementById('chat-msgs');
+  const div = document.createElement('div');
+  if (role==='ai') {
+    div.innerHTML = `<div class="msg-label">KENYAWATCH AI</div><div class="msg msg-ai">${text}</div>`;
+  } else {
+    div.style.cssText = 'display:flex;justify-content:flex-end;';
+    div.innerHTML = `<div><div class="msg-label" style="text-align:right">YOU</div><div class="msg msg-user">${text}</div></div>`;
+  }
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function quickQ(q) { document.getElementById('chat-input').value = q; sendChat(); }
+
+// ── MODAL ─────────────────────────────────────────────────────────────────────
+function openModal(id) { document.getElementById(id).classList.add('show'); }
+function closeModal(id) {
+  document.getElementById(id).classList.remove('show');
+  document.getElementById('scan-feedback').className = 'feedback-box';
+}
+document.querySelectorAll('.modal-overlay').forEach(m => {
+  m.addEventListener('click', e => { if (e.target===m) m.classList.remove('show'); });
+});
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+loadStats();
+</script>
+</body>
+</html>
