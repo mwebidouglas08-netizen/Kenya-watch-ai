@@ -2,7 +2,7 @@
 nixPkgs = ["nodejs_20", "npm-9_x"]
 
 [phases.install]
-cmds = ["npm --prefix backend install"]
+cmds = ["npm install"]
 
 [start]
 cmd = "node backend/server.js"
